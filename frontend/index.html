@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResumeAI — ATS Resume Analyzer & Optimizer</title>
+  <meta name="description"
+    content="Upload your resume, paste a job description, and get an instant ATS compatibility score. Highlight missing keywords, AI-rewrite bullet points, and download your optimized resume." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/styles/index.css" />
+</head>
+
+<body>
+  <!-- ===================== NAV ===================== -->
+  <nav id="main-nav">
+    <div class="nav-inner">
+      <a href="#landing" class="logo">
+        <span class="logo-icon">◆</span> Resume<span class="accent">AI</span>
+      </a>
+      <div class="nav-links">
+        <a href="#landing">Home</a>
+        <a href="#pricing-section">Pricing</a>
+        <div id="auth-area">
+          <button id="btn-google-login" class="btn btn-outline">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#EA4335"
+                d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+              <path fill="#4285F4"
+                d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+              <path fill="#FBBC05"
+                d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.003 24.003 0 0 0 0 21.56l7.98-6.19z" />
+              <path fill="#34A853"
+                d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+            </svg>
+            Sign in with Google
+          </button>
+          <div id="user-profile" class="hidden">
+            <img id="user-avatar" src="" alt="avatar" />
+            <span id="user-name"></span>
+            <button id="btn-logout" class="btn btn-sm">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== LANDING ===================== -->
+  <section id="landing" class="page active">
+    <div class="hero">
+      <div class="hero-badge">🚀 AI-Powered Resume Optimization</div>
+      <h1>Beat the <span class="gradient-text">ATS Bots.</span><br />Land More Interviews.</h1>
+      <p class="hero-sub">Upload your resume, paste the job description, and get an instant ATS score. See missing
+        keywords, auto-rewrite bullets with AI, and download your optimized resume.</p>
+      <div class="hero-actions">
+        <button id="btn-get-started" class="btn btn-primary btn-lg">
+          Analyze My Resume — Free
+          <span class="btn-arrow">→</span>
+        </button>
+        <div class="hero-note">✓ 3 free analyses · No credit card required</div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">94%</span><span class="stat-label">Avg. Score Increase</span></div>
+        <div class="stat"><span class="stat-num">50K+</span><span class="stat-label">Resumes Optimized</span></div>
+        <div class="stat"><span class="stat-num">3x</span><span class="stat-label">More Interviews</span></div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-grid" id="features">
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>ATS Score Analysis</h3>
+        <p>Get an instant compatibility score and see exactly how your resume matches the job description.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔴</div>
+        <h3>Missing Keywords</h3>
+        <p>Missing keywords highlighted in red with suggestions on exactly where to add them in your resume.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✏️</div>
+        <h3>Inline Editor</h3>
+        <p>Edit your resume directly on the platform. No need to switch between tools.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Rewrite</h3>
+        <p>Auto-rewrite bullet points using AI to naturally incorporate missing keywords.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Before vs After</h3>
+        <p>See your score improvement in real-time as you make changes to your resume.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📥</div>
+        <h3>Download PDF</h3>
+        <p>Download your optimized resume as a professional PDF, ready to submit.</p>
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div id="pricing-section" class="pricing">
+      <h2>Simple, Transparent <span class="gradient-text">Pricing</span></h2>
+      <div class="pricing-cards">
+        <div class="pricing-card">
+          <div class="pricing-badge">Free</div>
+          <div class="pricing-price">₹0</div>
+          <div class="pricing-period">3 full analyses</div>
+          <ul class="pricing-features">
+            <li>✓ ATS Score Analysis</li>
+            <li>✓ Missing Keyword Detection</li>
+            <li>✓ Inline Resume Editor</li>
+            <li>✓ AI Bullet Rewrite</li>
+            <li>✓ PDF Download</li>
+          </ul>
+          <button class="btn btn-outline btn-block" onclick="document.getElementById('btn-get-started').click()">Start
+            Free</button>
+        </div>
+        <div class="pricing-card popular">
+          <div class="pricing-badge">Pro — Most Popular</div>
+          <div class="pricing-price">₹149<span>/mo</span></div>
+          <div class="pricing-period">Unlimited analyses</div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Free</li>
+            <li>✓ Unlimited ATS Scans</li>
+            <li>✓ Priority AI Rewrites</li>
+            <li>✓ Resume History & Versions</li>
+            <li>✓ Priority Support</li>
+          </ul>
+          <button id="btn-subscribe" class="btn btn-primary btn-block">Upgrade to Pro</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ANALYZE ===================== -->
+  <section id="analyze" class="page">
+    <div class="analyze-container">
+      <div class="section-header">
+        <h2>Analyze Your Resume</h2>
+        <div id="usage-badge" class="usage-badge">3 / 3 free analyses remaining</div>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Resume Upload -->
+        <div class="upload-card">
+          <h3>📄 Your Resume</h3>
+          <div id="drop-zone" class="drop-zone">
+            <div class="drop-icon">☁️</div>
+            <p>Drag & drop your resume here</p>
+            <p class="drop-hint">PDF, DOCX, or TXT · Max 5MB</p>
+            <input type="file" id="file-input" accept=".pdf,.docx,.doc,.txt" hidden />
+            <button id="btn-browse" class="btn btn-outline btn-sm">Browse Files</button>
+          </div>
+          <div id="file-info" class="file-info hidden">
+            <span id="file-name"></span>
+            <button id="btn-remove-file" class="btn-icon" title="Remove">✕</button>
+          </div>
+          <div class="divider-or"><span>OR</span></div>
+          <textarea id="resume-text" class="textarea" placeholder="Paste your resume text here..." rows="8"></textarea>
+        </div>
+
+        <!-- JD Paste -->
+        <div class="upload-card">
+          <h3>📋 Job Description</h3>
+          <textarea id="jd-text" class="textarea" placeholder="Paste the job description here..." rows="16"></textarea>
+        </div>
+      </div>
+
+      <button id="btn-analyze" class="btn btn-primary btn-lg btn-block" disabled>
+        <span class="btn-loader hidden" id="analyze-loader"></span>
+        Analyze & Score My Resume
+      </button>
+    </div>
+
+    <!-- ===================== RESULTS ===================== -->
+    <div id="results" class="results hidden">
+      <div class="results-header">
+        <h2>Your ATS Score</h2>
+      </div>
+
+      <!-- Score Gauge -->
+      <div class="score-section">
+        <div class="score-gauge" id="score-gauge">
+          <svg viewBox="0 0 200 200" class="gauge-svg">
+            <circle cx="100" cy="100" r="85" class="gauge-bg" />
+            <circle cx="100" cy="100" r="85" class="gauge-fill" id="gauge-fill" />
+          </svg>
+          <div class="gauge-center">
+            <span class="gauge-score" id="gauge-score">0</span>
+            <span class="gauge-label">ATS Score</span>
+          </div>
+        </div>
+        <div class="score-verdict" id="score-verdict"></div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="keywords-section">
+        <div class="keywords-col">
+          <h3 class="kw-title matched">✓ Matched Keywords</h3>
+          <div id="matched-keywords" class="keyword-chips"></div>
+        </div>
+        <div class="keywords-col">
+          <h3 class="kw-title missing">✗ Missing Keywords</h3>
+          <div id="missing-keywords" class="keyword-chips"></div>
+        </div>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="suggestions-section" id="suggestions-section">
+        <h3>💡 Where to Add Missing Keywords</h3>
+        <div id="suggestions-list" class="suggestions-list"></div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="results-actions">
+        <button id="btn-open-editor" class="btn btn-primary btn-lg">
+          ✏️ Edit Resume & Optimize
+        </button>
+        <button id="btn-new-analysis" class="btn btn-outline btn-lg">
+          🔄 New Analysis
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EDITOR ===================== -->
+  <section id="editor" class="page">
+    <div class="editor-container">
+      <div class="editor-toolbar">
+        <h2>Resume Editor</h2>
+        <div class="toolbar-actions">
+          <button id="btn-rescore" class="btn btn-outline">📊 Re-Score</button>
+          <button id="btn-download" class="btn btn-primary">📥 Download PDF</button>
+        </div>
+      </div>
+
+      <!-- Before / After -->
+      <div id="comparison" class="comparison hidden">
+        <div class="comp-card before">
+          <div class="comp-label">Before</div>
+          <div class="comp-score" id="score-before">0</div>
+        </div>
+        <div class="comp-arrow">→</div>
+        <div class="comp-card after">
+          <div class="comp-label">After</div>
+          <div class="comp-score" id="score-after">0</div>
+        </div>
+        <div class="comp-diff" id="comp-diff"></div>
+      </div>
+
+      <!-- Editor Area -->
+      <div class="editor-layout">
+        <div class="editor-main">
+          <div id="resume-editor" class="resume-editor" contenteditable="true"></div>
+        </div>
+        <div class="editor-sidebar">
+          <div class="sidebar-card">
+            <h4>🔴 Missing Keywords</h4>
+            <div id="editor-missing-kw" class="keyword-chips"></div>
+          </div>
+          <div class="sidebar-card">
+            <h4>🚀 Auto-Optimize</h4>
+            <p class="sidebar-hint">Automatically rewrite all your bullet points to include missing keywords. One click
+              to boost your score!</p>
+            <button id="btn-auto-optimize" class="btn btn-primary btn-block">⚡ Auto-Optimize All Bullets</button>
+          </div>
+          <div class="sidebar-card">
+            <h4>🤖 Manual AI Rewrite</h4>
+            <p class="sidebar-hint">Select a specific bullet point in your resume, then click below to rewrite just that
+              bullet.</p>
+            <button id="btn-ai-rewrite" class="btn btn-outline btn-block">AI Rewrite Selected</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAYWALL MODAL ===================== -->
+  <div id="paywall-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="btn-close-modal">✕</button>
+      <div class="modal-icon">🔒</div>
+      <h2>Free Analyses Used Up</h2>
+      <p>You've used all 3 free analyses. Upgrade to Pro for unlimited ATS scans, AI rewrites, and more.</p>
+      <div class="modal-price">₹149<span>/month</span></div>
+      <button id="btn-modal-subscribe" class="btn btn-primary btn-lg btn-block">Upgrade to Pro — ₹149/mo</button>
+      <p class="modal-note">Cancel anytime · Secure payment</p>
+    </div>
+  </div>
+
+  <!-- ===================== TOAST ===================== -->
+  <div id="toast-container"></div>
+
+  <footer>
+    <p>© 2026 ResumeAI — Built to help you land your dream job.</p>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

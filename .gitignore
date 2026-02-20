@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build output
+dist/
+__pycache__/
+
+# Environment variables (contains API keys!)
+.env
+api/.env
+frontend/.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
