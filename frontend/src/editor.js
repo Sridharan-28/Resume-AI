@@ -2,8 +2,6 @@
 // ResumeAI — Editor Module
 // ============================================
 import {
-    extractKeywords,
-    calculateATSScore,
     localRewriteBullet,
     downloadAsPDF,
     showToast,
@@ -234,19 +232,12 @@ function formatResumeForEditor(text, matchedKeywords, missingKw) {
 }
 
 /**
- * Re-score the resume after edits
+ * Re-score the resume after edits — uses backend API for consistency
  */
-function rescoreResume() {
+async function rescoreResume() {
     const editor = document.getElementById('resume-editor');
-    // Get plain text from contenteditable (handles all child elements)
-    let plainText = '';
-    editor.childNodes.forEach(node => {
-        if (node.nodeType === 3) { // text node
-            plainText += node.textContent + '\n';
-        } else if (node.nodeType === 1) { // element node
-            plainText += (node.innerText || node.textContent) + '\n';
-        }
-    });
+    // Get plain text from contenteditable
+    let plainText = editor.innerText || editor.textContent || '';
     plainText = plainText.trim();
 
     if (!plainText || plainText.length < 20) return;
@@ -256,17 +247,53 @@ function rescoreResume() {
         return;
     }
 
-    const resumeKw = extractKeywords(plainText);
-    const result = calculateATSScore(resumeKw, jdKeywords);
+    let newScore = 0;
+    let newMissing = [];
 
-    currentScore = result.score;
+    // Try backend API first (same algorithm as initial analysis)
+    try {
+        const response = await fetch(`${API_URL}/api/analyze`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ resume_text: plainText, jd_text: jdText }),
+            signal: AbortSignal.timeout(10000)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            newScore = data.score;
+            newMissing = data.missing_keywords || [];
+        } else {
+            throw new Error('API error');
+        }
+    } catch {
+        // Fallback: simple text-based keyword matching (no extractKeywords)
+        const resumeLower = plainText.toLowerCase();
+        const matched = [];
+        const missing = [];
+
+        jdKeywords.forEach(kw => {
+            if (resumeLower.includes(kw.toLowerCase())) {
+                matched.push(kw);
+            } else {
+                missing.push(kw);
+            }
+        });
+
+        newScore = jdKeywords.length > 0
+            ? Math.round((matched.length / jdKeywords.length) * 100)
+            : 0;
+        newMissing = missing;
+    }
+
+    currentScore = newScore;
 
     // Update comparison
     document.getElementById('score-after').textContent = currentScore;
     updateCompDiff();
 
     // Update sidebar missing keywords in real-time
-    missingKeywords = result.missing;
+    missingKeywords = newMissing;
     const editorMissingKw = document.getElementById('editor-missing-kw');
     editorMissingKw.innerHTML = missingKeywords.length
         ? missingKeywords.map(kw => `<span class="chip chip-red">${escapeHtml(kw)}</span>`).join('')
