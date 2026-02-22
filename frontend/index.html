@@ -23,7 +23,6 @@
       </a>
       <div class="nav-links">
         <a href="#landing">Home</a>
-        <a href="#pricing-section">Pricing</a>
         <div id="auth-area">
           <button id="btn-google-login" class="btn btn-outline">
             <svg width="18" height="18" viewBox="0 0 48 48">
@@ -60,7 +59,7 @@
           Analyze My Resume — Free
           <span class="btn-arrow">→</span>
         </button>
-        <div class="hero-note">✓ 3 free analyses · No credit card required</div>
+        <div class="hero-note">✓ 100% Free · Unlimited Analyses · No credit card required</div>
       </div>
       <div class="hero-stats">
         <div class="stat"><span class="stat-num">94%</span><span class="stat-label">Avg. Score Increase</span></div>
@@ -103,39 +102,7 @@
       </div>
     </div>
 
-    <!-- Pricing -->
-    <div id="pricing-section" class="pricing">
-      <h2>Simple, Transparent <span class="gradient-text">Pricing</span></h2>
-      <div class="pricing-cards">
-        <div class="pricing-card">
-          <div class="pricing-badge">Free</div>
-          <div class="pricing-price">₹0</div>
-          <div class="pricing-period">3 full analyses</div>
-          <ul class="pricing-features">
-            <li>✓ ATS Score Analysis</li>
-            <li>✓ Missing Keyword Detection</li>
-            <li>✓ Inline Resume Editor</li>
-            <li>✓ AI Bullet Rewrite</li>
-            <li>✓ PDF Download</li>
-          </ul>
-          <button class="btn btn-outline btn-block" onclick="document.getElementById('btn-get-started').click()">Start
-            Free</button>
-        </div>
-        <div class="pricing-card popular">
-          <div class="pricing-badge">Pro — Most Popular</div>
-          <div class="pricing-price">₹149<span>/mo</span></div>
-          <div class="pricing-period">Unlimited analyses</div>
-          <ul class="pricing-features">
-            <li>✓ Everything in Free</li>
-            <li>✓ Unlimited ATS Scans</li>
-            <li>✓ Priority AI Rewrites</li>
-            <li>✓ Resume History & Versions</li>
-            <li>✓ Priority Support</li>
-          </ul>
-          <button id="btn-subscribe" class="btn btn-primary btn-block">Upgrade to Pro</button>
-        </div>
-      </div>
-    </div>
+
   </section>
 
   <!-- ===================== ANALYZE ===================== -->
@@ -143,7 +110,7 @@
     <div class="analyze-container">
       <div class="section-header">
         <h2>Analyze Your Resume</h2>
-        <div id="usage-badge" class="usage-badge">3 / 3 free analyses remaining</div>
+
       </div>
 
       <div class="upload-grid">
@@ -281,19 +248,7 @@
     </div>
   </section>
 
-  <!-- ===================== PAYWALL MODAL ===================== -->
-  <div id="paywall-modal" class="modal hidden">
-    <div class="modal-backdrop"></div>
-    <div class="modal-content">
-      <button class="modal-close" id="btn-close-modal">✕</button>
-      <div class="modal-icon">🔒</div>
-      <h2>Free Analyses Used Up</h2>
-      <p>You've used all 3 free analyses. Upgrade to Pro for unlimited ATS scans, AI rewrites, and more.</p>
-      <div class="modal-price">₹149<span>/month</span></div>
-      <button id="btn-modal-subscribe" class="btn btn-primary btn-lg btn-block">Upgrade to Pro — ₹149/mo</button>
-      <p class="modal-note">Cancel anytime · Secure payment</p>
-    </div>
-  </div>
+
 
   <!-- ===================== TOAST ===================== -->
   <div id="toast-container"></div>

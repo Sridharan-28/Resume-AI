@@ -10,7 +10,7 @@ import {
     showToast,
     navigateTo
 } from './utils.js';
-import { canAnalyze, incrementUsage, getRemainingAnalyses, isAuthenticated } from './auth.js';
+import { isAuthenticated } from './auth.js';
 
 let lastAnalysis = null;
 
@@ -135,18 +135,8 @@ export function initAnalyzer() {
             await auth.signInWithGoogle();
         }
 
-        // Check usage limits
-        const allowed = await canAnalyze();
-        if (!allowed) {
-            document.getElementById('paywall-modal').classList.remove('hidden');
-            return;
-        }
-
         await runAnalysis();
     });
-
-    // Update usage badge
-    updateUsageBadge();
 }
 
 /**
@@ -226,18 +216,12 @@ async function runAnalysis() {
             jdKeywords
         };
 
-        // Increment usage
-        await incrementUsage(score, null);
-
         // Render results
         renderResults(score, matched, missing, suggestions);
 
         // Show results section
         resultsEl.classList.remove('hidden');
         resultsEl.scrollIntoView({ behavior: 'smooth' });
-
-        // Update usage badge
-        updateUsageBadge();
 
         showToast(`ATS Score: ${score}/100`, score >= 70 ? 'success' : 'error');
 
@@ -350,26 +334,4 @@ function escapeHtml(str) {
  */
 export function getLastAnalysis() {
     return lastAnalysis;
-}
-
-/**
- * Update the usage badge
- */
-async function updateUsageBadge() {
-    const badge = document.getElementById('usage-badge');
-    try {
-        const remaining = await getRemainingAnalyses();
-        if (remaining === Infinity) {
-            badge.textContent = '⭐ Pro — Unlimited analyses';
-            badge.style.borderColor = 'var(--accent)';
-        } else {
-            badge.textContent = `${remaining} / 3 free analyses remaining`;
-            if (remaining <= 1) {
-                badge.style.borderColor = 'var(--red)';
-                badge.style.color = 'var(--red)';
-            }
-        }
-    } catch {
-        badge.textContent = '3 / 3 free analyses remaining';
-    }
 }
