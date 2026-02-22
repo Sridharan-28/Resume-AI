@@ -436,7 +436,7 @@ async function rewriteSelectedBullet() {
 }
 
 /**
- * Auto-optimize: calls backend AI to optimize entire resume, falls back to keyword injection
+ * Auto-optimize: calls backend AI to optimize entire resume, falls back to smart keyword injection
  */
 async function autoOptimizeAllBullets() {
     const editor = document.getElementById('resume-editor');
@@ -446,11 +446,21 @@ async function autoOptimizeAllBullets() {
         return;
     }
 
-    // Filter out garbage keywords
-    const safeMissing = missingKeywords.filter(k => k.length > 2 && !['needed', 'apps', 'complex', 'queries'].includes(k.toLowerCase()));
+    // Filter out garbage/generic keywords that don't belong in a resume
+    const genericWords = new Set([
+        'needed', 'apps', 'complex', 'queries', 'job', 'title', 'role', 'roles',
+        'company', 'position', 'candidate', 'applicant', 'information', 'compliance',
+        'minimum', 'equivalent', 'preferred', 'together', 'effectively', 'ensures',
+        'standards', 'detailed', 'insights', 'reports', 'enhance', 'processing',
+        'advanced', 'required', 'education', 'bachelor', 'degree', 'tools',
+        'computer', 'science', 'job title'
+    ]);
+    const safeMissing = missingKeywords.filter(k =>
+        k.length > 2 && !genericWords.has(k.toLowerCase())
+    );
 
     if (safeMissing.length === 0) {
-        showToast('✅ No meaningful keywords missing!', 'success');
+        showToast('✅ No meaningful keywords missing — your resume is well-optimized!', 'success');
         return;
     }
 
@@ -462,11 +472,7 @@ async function autoOptimizeAllBullets() {
 
     try {
         // Get current resume text from editor
-        let plainText = '';
-        editor.childNodes.forEach(node => {
-            if (node.nodeType === 3) plainText += node.textContent + '\n';
-            else if (node.nodeType === 1) plainText += (node.innerText || node.textContent) + '\n';
-        });
+        let plainText = editor.innerText || editor.textContent || '';
         plainText = plainText.trim();
 
         let usedAi = false;
@@ -481,15 +487,15 @@ async function autoOptimizeAllBullets() {
                     jd_text: jdText,
                     missing_keywords: safeMissing
                 }),
-                signal: AbortSignal.timeout(30000) // 30s for full resume
+                signal: AbortSignal.timeout(30000)
             });
 
             if (response.ok) {
                 const data = await response.json();
                 usedAi = data.used_ai;
 
-                if (usedAi && data.optimized_text) {
-                    // AI optimized the entire resume — replace editor content
+                if (usedAi && data.optimized_text && data.optimized_text.length > plainText.length * 0.7) {
+                    // AI optimized — verify it returned a proper resume (not just keywords)
                     const analysis = {
                         matched: jdKeywords.filter(kw => !safeMissing.includes(kw)),
                         missing: safeMissing
@@ -503,45 +509,99 @@ async function autoOptimizeAllBullets() {
                     );
                     showToast(`🤖 AI optimized resume! Added ${data.keywords_added.length} keywords.`, 'success');
                 } else {
-                    throw new Error('Fallback to client-side');
+                    throw new Error('AI response too short or not AI — fallback');
                 }
             } else {
                 throw new Error(`API returned ${response.status}`);
             }
         } catch (apiErr) {
-            console.warn('⚠️ Backend unavailable, using client-side optimization:', apiErr.message);
+            console.warn('⚠️ Using client-side optimization:', apiErr.message);
 
-            // Client-side fallback: add "Additional Skills" line
-            let existingSkillLine = null;
-            for (const el of editor.children) {
-                if (el.textContent.includes('Additional Skills:')) {
-                    existingSkillLine = el;
-                    break;
-                }
-            }
+            // ── Smart client-side fallback ──
+            // Strategy: inject keywords into existing bullet points where they contextually fit,
+            // then add remaining to Technical Skills section
 
-            const skillsList = safeMissing.map(kw => kw.charAt(0).toUpperCase() + kw.slice(1)).join(', ');
+            const bullets = editor.querySelectorAll('.editor-bullet');
+            const injected = new Set();
 
-            if (existingSkillLine) {
-                existingSkillLine.textContent = `Additional Skills: ${skillsList}`;
-            } else {
-                const skillsLine = document.createElement('p');
-                skillsLine.style.cssText = 'font-family:Calibri,Arial,sans-serif;font-size:13px;margin:6px 0;color:#ddd;';
-                skillsLine.textContent = `Additional Skills: ${skillsList}`;
+            // Step 1: Try to inject each keyword into a relevant bullet point
+            for (const kw of safeMissing) {
+                if (injected.has(kw)) continue;
 
-                let inserted = false;
-                const headings = editor.querySelectorAll('h2');
-                for (const h of headings) {
-                    if (/skills|competenc|expertise|technolog/i.test(h.textContent)) {
-                        h.insertAdjacentElement('afterend', skillsLine);
-                        inserted = true;
+                for (const bullet of bullets) {
+                    const text = bullet.textContent.replace('•', '').trim();
+                    // Check if this bullet is contextually related to the keyword
+                    const kwLower = kw.toLowerCase();
+                    const textLower = text.toLowerCase();
+
+                    // Skip if keyword is already present
+                    if (textLower.includes(kwLower)) {
+                        injected.add(kw);
+                        break;
+                    }
+
+                    // Try to find a contextual match and inject
+                    const relatedTerms = getRelatedContext(kwLower);
+                    const hasRelatedContent = relatedTerms.some(term => textLower.includes(term));
+
+                    if (hasRelatedContent && text.length > 30) {
+                        // Inject keyword naturally at the end of the bullet
+                        const originalText = bullet.textContent;
+                        const cleanText = originalText.replace(/\.\s*$/, '');
+                        bullet.textContent = `${cleanText}, leveraging ${kw}.`;
+                        injected.add(kw);
                         break;
                     }
                 }
-                if (!inserted) editor.appendChild(skillsLine);
             }
 
-            showToast(`⚡ Added ${safeMissing.length} missing keywords!`, 'success');
+            // Step 2: Add remaining keywords to Technical Skills section
+            const remaining = safeMissing.filter(kw => !injected.has(kw));
+            if (remaining.length > 0) {
+                const skillsList = remaining.map(kw => kw.charAt(0).toUpperCase() + kw.slice(1)).join(', ');
+
+                // Find existing "Additional Skills" or "Technical Skills" line
+                let existingSkillLine = null;
+                for (const el of editor.children) {
+                    if (el.textContent.includes('Additional Skills:')) {
+                        existingSkillLine = el;
+                        break;
+                    }
+                }
+
+                if (existingSkillLine) {
+                    // Append to existing skills line
+                    existingSkillLine.textContent = existingSkillLine.textContent.replace(/\s*$/, '') + ', ' + skillsList;
+                } else {
+                    // Create new skills line under Technical Skills heading
+                    const skillsLine = document.createElement('p');
+                    skillsLine.style.cssText = 'font-family:Calibri,Arial,sans-serif;font-size:13px;margin:6px 0;color:#ddd;';
+                    skillsLine.textContent = `Additional Skills: ${skillsList}`;
+
+                    let inserted = false;
+                    const headings = editor.querySelectorAll('h2');
+                    for (const h of headings) {
+                        if (/skills|competenc|expertise|technolog/i.test(h.textContent)) {
+                            // Insert after the heading's next sibling (existing skills line)
+                            let target = h.nextElementSibling;
+                            while (target && !target.matches('h2')) {
+                                target = target.nextElementSibling;
+                            }
+                            if (target) {
+                                target.insertAdjacentElement('beforebegin', skillsLine);
+                            } else {
+                                h.insertAdjacentElement('afterend', skillsLine);
+                            }
+                            inserted = true;
+                            break;
+                        }
+                    }
+                    if (!inserted) editor.appendChild(skillsLine);
+                }
+            }
+
+            const totalAdded = injected.size + remaining.length;
+            showToast(`⚡ Optimized! Added ${totalAdded} keywords to your resume.`, 'success');
         }
     } catch (err) {
         showToast('Optimization failed: ' + err.message, 'error');
@@ -551,7 +611,39 @@ async function autoOptimizeAllBullets() {
     }
 
     // Re-score to reflect changes
-    setTimeout(() => rescoreResume(), 300);
+    setTimeout(() => rescoreResume(), 500);
+}
+
+/**
+ * Get related context terms for a keyword to find matching bullets
+ */
+function getRelatedContext(keyword) {
+    const contextMap = {
+        'data': ['dataset', 'database', 'report', 'dashb', 'analy', 'insight', 'metric', 'record', 'transact'],
+        'analytics': ['report', 'dashb', 'metric', 'insight', 'visual', 'trend', 'perform', 'track'],
+        'data analytics': ['report', 'dashb', 'metric', 'insight', 'visual', 'trend'],
+        'machine learning': ['model', 'predict', 'algorithm', 'train', 'classif', 'neural', 'ai', 'automat'],
+        'power bi': ['dashb', 'report', 'visual', 'bi', 'metric', 'kpi'],
+        'sql': ['query', 'database', 'table', 'data', 'join', 'select', 'mysql', 'postgres'],
+        'python': ['script', 'automat', 'program', 'code', 'develop', 'framework'],
+        'business': ['stakeholder', 'strategy', 'revenue', 'profit', 'growth', 'client', 'decision'],
+        'analysis': ['report', 'insight', 'metric', 'evaluat', 'assess', 'review', 'investig'],
+        'intelligence': ['insight', 'decision', 'strateg', 'report', 'dashb', 'bi'],
+        'automation': ['automat', 'workflow', 'process', 'efficien', 'reduc', 'streamlin'],
+        'optimization': ['improv', 'efficien', 'perform', 'reduc', 'enhanc', 'streamlin'],
+        'statistical': ['statist', 'model', 'analys', 'predict', 'regress', 'correlat'],
+        'security': ['secur', 'protect', 'complian', 'audit', 'risk', 'access'],
+        'management': ['manag', 'lead', 'coordinat', 'oversee', 'supervise', 'team'],
+        'systems': ['system', 'platform', 'infra', 'architect', 'integrat'],
+        'regulations': ['regulat', 'compli', 'policy', 'standard', 'govern'],
+        'regulatory': ['regulat', 'compli', 'policy', 'standard', 'govern'],
+        'decision-making': ['decision', 'strateg', 'insight', 'recommend', 'evaluat'],
+        'learning': ['train', 'develop', 'skill', 'model', 'algorithm'],
+        'analyst': ['analy', 'report', 'data', 'insight', 'metric'],
+        'power': ['bi', 'dashb', 'report', 'query', 'pivot'],
+        'data analyst': ['data', 'analy', 'report', 'insight'],
+    };
+    return contextMap[keyword] || [keyword.substring(0, 4)];
 }
 
 function escapeHtml(str) {

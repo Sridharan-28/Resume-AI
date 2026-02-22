@@ -116,6 +116,16 @@ STOP_WORDS = {
     'right','say','try','best','part','per','based','high','time','key',
 }
 
+# Generic JD words that aren't real skills — filter from missing keywords
+GENERIC_JD_WORDS = {
+    'job', 'title', 'job title', 'role', 'roles', 'company', 'position',
+    'candidate', 'applicant', 'information', 'compliance', 'minimum',
+    'equivalent', 'preferred', 'together', 'effectively', 'ensures',
+    'standards', 'detailed', 'insights', 'reports', 'enhance', 'processing',
+    'advanced', 'required', 'education', 'bachelor', 'degree', 'tools',
+    'computer', 'science', 'needed', 'apps', 'complex', 'queries',
+}
+
 TECH_PATTERNS = re.compile(
     r'\b(python|java|javascript|typescript|react|angular|vue|node\.?js|express|'
     r'django|flask|fastapi|sql|nosql|mongodb|postgresql|mysql|aws|azure|gcp|'
@@ -168,11 +178,16 @@ def calculate_score(resume_keywords: list[str], jd_keywords: list[str]):
     if not jd_keywords:
         return 0, [], []
 
+    # Filter out generic JD words that aren't real skills
+    filtered_jd = [kw for kw in jd_keywords if kw.lower() not in GENERIC_JD_WORDS]
+    if not filtered_jd:
+        filtered_jd = jd_keywords  # fallback if all got filtered
+
     resume_set = set(k.lower() for k in resume_keywords)
     matched = []
     missing = []
 
-    for kw in jd_keywords:
+    for kw in filtered_jd:
         lower = kw.lower()
         found = any(
             rk == lower or lower in rk or rk in lower
@@ -183,7 +198,7 @@ def calculate_score(resume_keywords: list[str], jd_keywords: list[str]):
         else:
             missing.append(kw)
 
-    score = round((len(matched) / len(jd_keywords)) * 100) if jd_keywords else 0
+    score = round((len(matched) / len(filtered_jd)) * 100) if filtered_jd else 0
     return score, matched, missing
 
 
